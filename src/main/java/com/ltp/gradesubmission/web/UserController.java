@@ -1,6 +1,5 @@
 package com.ltp.gradesubmission.web;
 
-
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,31 +17,29 @@ import lombok.AllArgsConstructor;
 
 import java.util.Map;
 
-
 @AllArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-
     UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id)
+    public ResponseEntity<String> findById(@PathVariable Long id)
     {
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUser(id).getUsername(), HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> createUser(@Valid @RequestBody User user)
     {
+        userService.saveUser(user);
         // Create a custom response map with the desired fields
         Map<String, Object> response = Map.of(
-                "status", "success",
-                "message", "User registration successful",
+                "status", true,
+                "message", "User successfully registration",
                 "user", user
         );
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

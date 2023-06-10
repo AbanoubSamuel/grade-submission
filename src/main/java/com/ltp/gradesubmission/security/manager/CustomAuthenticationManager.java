@@ -1,21 +1,31 @@
 package com.ltp.gradesubmission.security.manager;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import com.ltp.gradesubmission.entity.User;
+import com.ltp.gradesubmission.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.*;
 
-import javax.naming.AuthenticationException;
 
 @Component
+@AllArgsConstructor
 public class CustomAuthenticationManager implements AuthenticationManager {
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException
-    {
-        return null;
 
-    }
+    private UserService userService;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public org.springframework.security.core.Authentication authenticate(org.springframework.security.core.Authentication authentication) throws org.springframework.security.core.AuthenticationException {
-        return null;
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException
+    {
+        User user = userService.getUser(authentication.getName());
+        if (!bCryptPasswordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect password");
+
+        }
+        return new UsernamePasswordAuthenticationToken(authentication.getName(), user.getPassword());
     }
 }
